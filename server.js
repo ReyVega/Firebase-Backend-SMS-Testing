@@ -6,9 +6,8 @@ const config = require("./config");
 const patientRoutes = require("./routes/patient-routes");
 const doctorRoutes = require("./routes/doctor-routes");
 const appointmentRoutes = require("./routes/appointment-routes");
+const reminderRoutes = require("./routes/reminder-routes");
 const fileUpload = require('express-fileupload');
-
-
 
 const app = express();
 
@@ -18,7 +17,6 @@ app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({ extended: true }))
 app.use(fileUpload());
 
-
-app.use('/api', patientRoutes.routes, doctorRoutes.routes, appointmentRoutes.routes);
+app.use('/api', patientRoutes.routes, doctorRoutes.routes, appointmentRoutes.routes, reminderRoutes.routes);
 
 app.listen(config.port, () => console.log('App is listening on url http://localhost:' + config.port));
