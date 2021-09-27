@@ -1,11 +1,11 @@
 'use strict';
 
-const Appointment = require('../models/appointment');
+const reminder = require('../models/reminder');
 
 const notificationWorkerFactory = function() {
   return {
     run: function() {
-      Appointment.sendNotifications();
+      reminder.sendNotifications();
     },
   };
 };

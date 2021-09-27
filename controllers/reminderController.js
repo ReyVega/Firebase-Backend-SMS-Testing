@@ -2,23 +2,23 @@
 
 const momentTimeZone = require('moment-timezone');
 const moment = require('moment');
-const Appointment = require('../models/appointment');
+const reminder = require('../models/reminder');
 
 const getTimeZones = function () {
     return momentTimeZone.tz.names();
 };
 
 const function1 = async (req, res, next) => {
-    Appointment.find()
-        .then(function (appointments) {
-            res.render('appointments/index', { appointments: appointments });
+    reminder.find()
+        .then(function (reminders) {
+            res.render('reminders/index', { reminders: reminders });
         });
 }
 
 const function2 = async (req, res, next) => {
-    res.render('appointments/create', {
+    res.render('reminders/create', {
         timeZones: getTimeZones(),
-        appointment: new Appointment({
+        reminder: new reminder({
             name: '',
             phoneNumber: '',
             notification: '',
@@ -35,14 +35,14 @@ const function3 = async (req, res, next) => {
     const timeZone = req.body.timeZone;
     const time = moment(req.body.time, 'MM-DD-YYYY hh:mma');
 
-    const appointment = new Appointment({
+    const reminder = new reminder({
         name: name,
         phoneNumber: phoneNumber,
         notification: notification,
         timeZone: timeZone,
         time: time
     });
-    appointment.save()
+    reminder.save()
         .then(function () {
             res.redirect('/');
         });
@@ -50,11 +50,11 @@ const function3 = async (req, res, next) => {
 
 const function4 = async (req, res, next) => {
     const id = req.params.id;
-    Appointment.findOne({ _id: id })
-        .then(function (appointment) {
-            res.render('appointments/edit', {
+    reminder.findOne({ _id: id })
+        .then(function (reminder) {
+            res.render('reminders/edit', {
                 timeZones: getTimeZones(),
-                appointment: appointment
+                reminder: reminder
             });
         });
 }
@@ -67,15 +67,15 @@ const function5 = async (req, res, next) => {
     const timeZone = req.body.timeZone;
     const time = moment(req.body.time, 'MM-DD-YYYY hh:mma');
   
-    Appointment.findOne({_id: id})
-      .then(function(appointment) {
-        appointment.name = name;
-        appointment.phoneNumber = phoneNumber;
-        appointment.notification = notification;
-        appointment.timeZone = timeZone;
-        appointment.time = time;
+    reminder.findOne({_id: id})
+      .then(function(reminder) {
+        reminder.name = name;
+        reminder.phoneNumber = phoneNumber;
+        reminder.notification = notification;
+        reminder.timeZone = timeZone;
+        reminder.time = time;
   
-        appointment.save()
+        reminder.save()
           .then(function() {
             res.redirect('/');
           });
@@ -85,7 +85,7 @@ const function5 = async (req, res, next) => {
 const function6 = async(req, res, next) => {
     const id = req.params.id;
 
-    Appointment.remove({_id: id})
+    reminder.remove({_id: id})
       .then(function() {
         res.redirect('/');
       });

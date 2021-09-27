@@ -5,7 +5,7 @@ const moment = require('moment');
 const cfg = require('../config');
 const Twilio = require('twilio');
 
-const AppointmentSchema = new mongoose.Schema({
+const reminderSchema = new mongoose.Schema({
   name: String,
   phoneNumber: String,
   notification: Number,
@@ -13,39 +13,39 @@ const AppointmentSchema = new mongoose.Schema({
   time: {type: Date, index: true},
 });
 
-AppointmentSchema.methods.requiresNotification = function(date) {
+reminderSchema.methods.requiresNotification = function(date) {
   return Math.round(moment.duration(moment(this.time).tz(this.timeZone).utc()
                           .diff(moment(date).utc())
                         ).asMinutes()) === this.notification;
 };
 
-AppointmentSchema.statics.sendNotifications = function(callback) {
+reminderSchema.statics.sendNotifications = function(callback) {
   // now
   const searchDate = new Date();
-  Appointment
+  reminder
     .find()
-    .then(function(appointments) {
-      appointments = appointments.filter(function(appointment) {
-              return appointment.requiresNotification(searchDate);
+    .then(function(reminders) {
+      reminders = reminders.filter(function(reminder) {
+              return reminder.requiresNotification(searchDate);
       });
-      if (appointments.length > 0) {
-        sendNotifications(appointments);
+      if (reminders.length > 0) {
+        sendNotifications(reminders);
       }
     });
 
     /**
     * Send messages to all appoinment owners via Twilio
-    * @param {array} appointments List of appointments.
+    * @param {array} reminders List of reminders.
     */
-    function sendNotifications(appointments) {
+    function sendNotifications(reminders) {
         const client = new Twilio(cfg.twilioAccountSid, cfg.twilioAuthToken);
-        appointments.forEach(function(appointment) {
+        reminders.forEach(function(reminder) {
             // Create options to send the message
             const options = {
-                to: `+ ${appointment.phoneNumber}`,
+                to: `+ ${reminder.phoneNumber}`,
                 from: cfg.twilioPhoneNumber,
                 /* eslint-disable max-len */
-                body: `Hi ${appointment.name}. Just a reminder that you have an appointment coming up.`,
+                body: `Hi ${reminder.name}. Just a reminder that you have an reminder coming up.`,
                 /* eslint-enable max-len */
             };
 
@@ -56,8 +56,8 @@ AppointmentSchema.statics.sendNotifications = function(callback) {
                     console.error(err);
                 } else {
                     // Log the last few digits of a phone number
-                    let masked = appointment.phoneNumber.substr(0,
-                        appointment.phoneNumber.length - 5);
+                    let masked = reminder.phoneNumber.substr(0,
+                        reminder.phoneNumber.length - 5);
                     masked += '*****';
                     console.log(`Message sent to ${masked}`);
                 }
@@ -73,5 +73,5 @@ AppointmentSchema.statics.sendNotifications = function(callback) {
 };
 
 
-const Appointment = mongoose.model('appointment', AppointmentSchema);
-module.exports = Appointment;
+const reminder = mongoose.model('reminder', reminderSchema);
+module.exports = reminder;
